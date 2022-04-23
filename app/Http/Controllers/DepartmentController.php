@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\department;
 use Illuminate\Http\Request;
-use App\Models\employe;
 
 class DepartmentController extends Controller
 {
@@ -35,8 +34,6 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        $employe  = employe::get();
-        return view('create')->with(compact('employe'));
     }
 
     /**
@@ -47,43 +44,6 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {  
-         $data = request()->validate([
-        'name' => 'required',
-        'email' => 'required|email',
-        'employe_id' => 'required',
-        'designation' => 'required',
-        'country' => 'required',
-        'state' => 'required',
-        'city' => 'required',
-        'mobile' => 'required|digits:10|numeric',
-        'gender' => 'required',
-        'hobbies' => 'required',
-        'file'=>'required',
-        'file.*' => 'image|mimes:jpeg,jpg,png|max:20480',
-        ]);
-        try{
-            $newPostImageName = uniqid() . '-' . $request->file('file')->getClientOriginalName();
-
-        $request->file('file')->move(public_path('storage/images'), $newPostImageName);
-        $input = $request->all();
-        department::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'employe_id'=>$request->employe_id,
-            'designation'=>$request->designation,
-            'country'=>$request->country,
-            'state'=>$request->state,
-            'city'=>$request->city,
-            'mobile'=>$request->mobile,
-            'gender'=>$request->gender,
-            'image'=>$newPostImageName,
-        ]);
-        return redirect('/')->with('flash_message', 'department Addedd!');  
-    
-        }catch(\Exception $e) {
-            return $this->getExceptionResponse($e);
-        }
-        
         }
 
     /**
@@ -143,7 +103,8 @@ class DepartmentController extends Controller
         fclose($handle);
 
         //download command
-        return Response::download($filename, "download.csv", $headers);
+         Response::download($filename, "download.csv", $headers);
+        return redirect('/')->with('flash_message', 'data exported!');
     }
     /**
      * Show the form for editing the specified resource.
@@ -153,13 +114,7 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        try{
-            $department = department::find($id);
-            $employe  = employe::get();
-            return view('edit',compact('department','employe'));
-        }catch(\Exception $e) {
-            return $this->getExceptionResponse($e);
-        } 
+        
     }
 
     /**
@@ -171,10 +126,7 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $department = department::find($id);
-        $input = $request->all();
-        $department->update($input);
-        return redirect('/')->with('flash_message', 'details Updated!'); 
+         
     }
 
     /**
@@ -185,11 +137,6 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        try{
-            department::destroy($id);
-            return redirect('/')->with('flash_message', 'Contact deleted!');
-        }catch(\Exception $e) {
-            return $this->getExceptionResponse($e);
-        } 
+    
     }
 }
